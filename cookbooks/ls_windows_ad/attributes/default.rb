@@ -1,0 +1,5 @@
+default['ls_windows_ad']['domain_name'] = 'burke.local'
+default['ls_windows_ad']['safe_mode_admin_pswd'] = 'Deeana87'
+default['ls_windows_ad']['admin_username'] = 'burke.local\Administrator'
+default['ls_windows_ad']['admin_pswd'] = 'Deeana87'
+default['ls_windows_ad']['role'] = 'primary'
