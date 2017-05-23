@@ -1,9 +1,9 @@
 #
-# Author:: Paul Morton (<pmorton@biaprotect.com>)
+# Author:: Seth Chisamore (<schisamo@chef.io>)
 # Cookbook Name:: windows
-# Resource:: auto_run
+# Resource:: reboot
 #
-# Copyright:: 2011, Business Intelligence Associates, Inc
+# Copyright:: 2011-2015, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +18,17 @@
 # limitations under the License.
 #
 
+actions :request, :cancel
+
+attribute :timeout, kind_of: Integer, name_attribute: true
+attribute :reason, kind_of: String, default: 'Chef client run'
+
 def initialize(name, run_context = nil)
   super
-  @action = :create
+  @action = :request
+  Chef::Log.warn <<-EOF
+The windows_reboot resource is deprecated. Please use the reboot resource in
+Chef Client 12. windows_reboot will be removed in the next major version
+release of the Windows cookbook.
+EOF
 end
-
-actions :create, :remove
-
-attribute :program, kind_of: String
-attribute :name, kind_of: String, name_attribute: true
-attribute :args, kind_of: String, default: ''
