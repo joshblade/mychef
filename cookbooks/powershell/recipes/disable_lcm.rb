@@ -1,9 +1,9 @@
 #
 # Author:: Aliasgar Batterywala (<aliasgar.batterywala@clogeny.com>)
-# Cookbook:: powershell
+# Cookbook Name:: powershell
 # Recipe:: disable_lcm
 #
-# Copyright:: 2015-2016, Chef Software, Inc.
+# Copyright:: Copyright (c) 2015 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,10 +17,11 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-if platform_family?('windows')
+include_recipe 'powershell::powershell5'
+include_recipe 'powershell::dsc'
 
-  include_recipe 'powershell::powershell5'
-  include_recipe 'powershell::dsc'
+case node['platform']
+when 'windows'
 
   directory 'Creating temporary directory to store LCM MOF files' do
     path node['lcm']['mof']['temp_dir']

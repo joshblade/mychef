@@ -1,7 +1,7 @@
 #
 # Author:: Siddheshwar More (<siddheshwar.more@clogeny.com>)
 #
-# Copyright:: 2014-2016, Chef Software, Inc
+# Copyright:: 2014, Chef, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -22,21 +22,15 @@ require 'chef'
 require 'chef/mixin/shell_out'
 require 'uri'
 
-class PowershellModuleProvider < Chef::Provider::LWRPBase
+class PowershellModuleProvider < Chef::Provider
   include Chef::Mixin::ShellOut
-
-  use_inline_resources
-
-  def whyrun_supported?
-    true
-  end
 
   def initialize(powershell_module, run_context)
     super(powershell_module, run_context)
     @powershell_module = powershell_module
   end
 
-  action :install do
+  def action_install
     raise ArgumentError, "Required attribute 'package_name' for module installation" unless @new_resource.package_name
     raise ArgumentError, "Required attribute 'destination' or 'source' for module installation" unless @new_resource.destination || @new_resource.source
 
@@ -46,7 +40,7 @@ class PowershellModuleProvider < Chef::Provider::LWRPBase
     end
   end
 
-  action :uninstall do
+  def action_uninstall
     raise ArgumentError, "Required attribute 'package_name' for module uninstallation" unless @new_resource.package_name
     converge_by("Powershell Module '#{@powershell_module.package_name}'") do
       uninstall_module
@@ -108,15 +102,10 @@ class PowershellModuleProvider < Chef::Provider::LWRPBase
     begin
       require 'zip'
     rescue LoadError
-
-      Chef::Log.debug('Did not find rubyzip gem installed. Installing now')
-
-      chef_gem 'rubyzip' do
-        compile_time true
-        action :install
-      end
-
-      require 'zip'
+      raise(
+        'Could not load the rubyzip gem, please make sure this gem is installed with the "chef_gem" resource ' \
+        'or include the powershell::default recipe before using powershell_module.'
+      )
     end
 
     Zip::File.open(zip_file) do |zip|
