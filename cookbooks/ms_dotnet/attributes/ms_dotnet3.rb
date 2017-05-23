@@ -1,11 +1,9 @@
 #
 # Cookbook Name:: ms_dotnet
-# Recipe:: regiis
-# Author: Kendrick Martin(<kendrick.martin@webtrends.com>)
+# Attributes:: ms_dotnet3
+# Author:: Jeremy MAURO (<j.mauro@criteo.com>)
 #
-# This recipe registers .NET 4 with IIS to install ISAPI filters
-#
-# Copyright 2012, Webtrends, Inc.
+# Copyright (C) 2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,12 +16,15 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+#
 
-guard_file = ::File.join(::Chef::Config['file_cache_path'], 'aspnet_regiis')
-# register once and only if IIS is installed
-execute 'aspnet_regiis' do
-  action :run
-  command "%WINDIR%\\Microsoft.Net\\Framework64\\v4.0.30319\\aspnet_regiis.exe -i -enable > #{guard_file}"
-  creates guard_file
-  only_if 'sc.exe query W3SVC'
+if platform? 'windows'
+  # DISM /all is only available on NT Version 6.2 (Windows 8/2012) or newer.
+  default['ms_dotnet']['v3']['enable_all_features'] = true
+
+  # DISM /source is only available on NT Version 6.2 (Windows 8/2012) or newer.
+  # It can be used to use custom source folder e.g:
+  # * Mounted Windows ISO: 'd:\sources\sxs'
+  # * Windows share of a sxs folder: '\\servername\sxs'
+  default['ms_dotnet']['v3']['source'] = nil
 end
