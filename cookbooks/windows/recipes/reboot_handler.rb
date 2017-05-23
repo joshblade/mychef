@@ -1,9 +1,9 @@
 #
-# Author:: Paul Morton (<pmorton@biaprotect.com>)
+# Author:: Seth Chisamore (<schisamo@chef.io>)
 # Cookbook Name:: windows
-# Resource:: auto_run
+# Recipe:: restart_handler
 #
-# Copyright:: 2011, Business Intelligence Associates, Inc
+# Copyright:: 2011-2015, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,13 +18,15 @@
 # limitations under the License.
 #
 
-def initialize(name, run_context = nil)
-  super
-  @action = :create
+remote_directory node['chef_handler']['handler_path'] do
+  source 'handlers'
+  recursive true
+  action :create
 end
 
-actions :create, :remove
-
-attribute :program, kind_of: String
-attribute :name, kind_of: String, name_attribute: true
-attribute :args, kind_of: String, default: ''
+chef_handler 'WindowsRebootHandler' do
+  source "#{node['chef_handler']['handler_path']}/windows_reboot_handler.rb"
+  arguments node['windows']['allow_pending_reboots']
+  supports report: true, exception: node['windows']['allow_reboot_on_failure']
+  action :enable
+end

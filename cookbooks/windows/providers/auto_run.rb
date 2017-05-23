@@ -1,7 +1,7 @@
 #
 # Author:: Paul Morton (<pmorton@biaprotect.com>)
 # Cookbook Name:: windows
-# Resource:: auto_run
+# Provider:: auto_run
 #
 # Copyright:: 2011, Business Intelligence Associates, Inc
 #
@@ -17,14 +17,17 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
+use_inline_resources if defined?(use_inline_resources)
 
-def initialize(name, run_context = nil)
-  super
-  @action = :create
+action :create do
+  windows_registry 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run' do
+    values new_resource.name => "\"#{new_resource.program}\" #{new_resource.args}"
+  end
 end
 
-actions :create, :remove
-
-attribute :program, kind_of: String
-attribute :name, kind_of: String, name_attribute: true
-attribute :args, kind_of: String, default: ''
+action :remove do
+  windows_registry 'HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run' do
+    values new_resource.name => ''
+    action :remove
+  end
+end
