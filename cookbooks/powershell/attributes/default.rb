@@ -1,9 +1,9 @@
 #
 # Author:: Seth Chisamore (<schisamo@chef.io>)
-# Cookbook:: powershell
+# Cookbook Name:: powershell
 # Attribute:: default
 #
-# Copyright:: 2014-2016, Chef Software, Inc.
+# Copyright:: Copyright (c) 2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.

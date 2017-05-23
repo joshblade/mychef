@@ -1,9 +1,9 @@
 #
 # Author:: Mukta Aphale (<mukta.aphale@clogeny.com>)
-# Cookbook:: powershell
+# Cookbook Name:: powershell
 # Recipe:: winrm
 #
-# Copyright:: 2014-2016, Chef Software, Inc.
+# Copyright:: Copyright (c) 2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -18,7 +18,8 @@
 # limitations under the License.
 #
 
-if platform_family?('windows')
+case node['platform']
+when 'windows'
 
   # Configure winrm
   # use attributes to add other configuration

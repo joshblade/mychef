@@ -1,9 +1,9 @@
 #
 # Author:: Julian C. Dunn (<jdunn@chef.io>)
-# Cookbook:: powershell
+# Cookbook Name:: powershell
 # Recipe:: powershell5
 #
-# Copyright:: 2014-2016, Chef Software, Inc.
+# Copyright:: Copyright (c) 2014 Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -20,8 +20,8 @@
 
 # PowerShell 5.0 RTM Download Page
 # https://www.microsoft.com/en-us/download/details.aspx?id=50395
-
-if platform_family?('windows')
+case node['platform']
+when 'windows'
 
   if ::Windows::VersionHelper.nt_version(node) >= 6.1
     include_recipe 'powershell::powershell2'
@@ -35,10 +35,10 @@ if platform_family?('windows')
       options '/quiet /norestart'
       timeout node['powershell']['powershell5']['timeout']
       action :install
-      returns [0, 42, 127, 3010, 2_359_302]
+      success_codes [0, 42, 127, 3010, 2_359_302]
       # Note that the :immediately is to immediately notify the other resource,
       # not to immediately reboot. The windows_reboot 'notifies' does that.
-      notifies :reboot_now, 'reboot[powershell]', :immediately if node['powershell']['installation_reboot_mode'] != 'no_reboot'
+      notifies :request, 'windows_reboot[powershell]', :immediately if reboot_pending? && node['powershell']['installation_reboot_mode'] != 'no_reboot'
       not_if { ::Powershell::VersionHelper.powershell_version?(node['powershell']['powershell5']['version']) }
     end
 
