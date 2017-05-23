@@ -1,6 +1,6 @@
 #
 # Cookbook Name:: ms_dotnet
-# Recipe:: ms_dotnet2
+# Library:: default
 # Author:: Baptiste Courtois (<b.courtois@criteo.com>)
 #
 # Copyright (C) 2015-2016, Criteo.
@@ -17,15 +17,23 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-return unless platform? 'windows'
+require_relative 'v2_helper'
+require_relative 'v3_helper'
+require_relative 'v4_helper'
 
-v2_info = node['ms_dotnet']['v2']
-
-ms_dotnet_framework v2_info['version'] do
-  timeout           node['ms_dotnet']['timeout']
-  include_patches   v2_info['include_patches']
-  feature_source    v2_info['feature_source'] unless v2_info['feature_source'].nil?
-  perform_reboot    v2_info['perform_reboot']
-  package_sources   v2_info['package_sources']
-  require_support   v2_info['require_support']
+# Library module for cookbook ms_dotnet
+module MSDotNet
+  # Factory method to get VersionHelper for a given major .NET version
+  def self.version_helper(node, major_version)
+    case major_version
+      when 2
+        V2Helper.new node
+      when 3
+        V3Helper.new node
+      when 4
+        V4Helper.new node
+      else
+        raise ArgumentError, "Unsupported version '#{major_version}'"
+    end
+  end
 end
