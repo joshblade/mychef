@@ -3,46 +3,6 @@ ms_dotnet CHANGELOG
 
 This file is used to list changes made in each version of the ms_dotnet cookbook.
 
-3.2.1
------
-- [PR 53][pr-53] olive42 - Fix install requirement check
-- [PR 49][pr-49] jugatsu - Improve ms_dotnet_framework example in README
-- [PR 46][pr-46] olivierlemasle - Install KB2919442 before KB2919355 for .NET 4.6
-- [PR 44][pr-44] smurawski - Fix version detection when none installed
-3.2.0
------
-- [PR 43][pr-43] smurawski - Migrate framework LWRP to custom resource
-
-3.1.1
------
-- [PR 38][pr-38] Jakauppila - Update .NET 4.6 prerequisites (KB3173424)
-
-3.1.0
------
-- b.courtois - Support Windows Server 2016.
-- [PR 35][pr-35] b.courtois - Add ability to perform required reboot when installing prerequisites and patches.
-- [PR 34][pr-34] b.courtois - Fix patches feature due to invalid prerequisites variable.
-- [PR 31][pr-31] Matasx - Add support for .NET version 4.6.2.
-- [PR 31][pr-31] Matasx - Resolve `0x80240017 WU_E_NOT_APPLICABLE` [issue with KB2919442][issue-29].
-
-3.0.0
------
-
-### Improvments
-
-* Introduce new framework LWRP to setup a specific .NET Version with all its prerequisites and patches.
-* Detection of the current installed version is now way more accurate.
-* Setup of .NET 3.5 is working properly.
-* Proper support of .NET 4.6 and .NET 4.6.1.
-* Packages and sources overriding is attribute driven.
-* Attribute structure is now the same for .NET 2, 3.5 and 4.
-* Add chefspecs and rspecs tests.
-
-### Breaking changes
-
-Default recipes and attributes structure have been updated to use the new LWRP.
-Refers to the README for description and examples of the new attributes.
-
 2.6.1
 -----
 - kamaradclimber - Define Windows::VersionHelper::ProductType constants only once
@@ -115,14 +75,3 @@ Refers to the README for description and examples of the new attributes.
 0.1.0
 -----
 - j.mauro - Initial release of ms_dotnet
-
-[issue-29]: https://github.com/criteo-cookbooks/ms_dotnet/issues/29
-[pr-31]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/31
-[pr-34]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/34
-[pr-35]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/35
-[pr-38]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/38
-[pr-43]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/43
-[pr-44]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/44
-[pr-46]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/46
-[pr-49]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/49
-[pr-53]:    https://github.com/criteo-cookbooks/ms_dotnet/pull/53
