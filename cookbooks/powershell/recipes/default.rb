@@ -1,10 +1,10 @@
 #
 # Author:: Seth Chisamore (<schisamo@chef.io>)
 # Author:: Julian C. Dunn (<jdunn@chef.io>)
-# Cookbook Name:: powershell
+# Cookbook:: powershell
 # Recipe:: default
 #
-# Copyright:: Copyright (c) 2011-2013 Chef Software, Inc.
+# Copyright:: 2011-2016, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,4 +19,4 @@
 # limitations under the License.
 #
 
-chef_gem 'rubyzip'
+Chef::Log.debug('The powershell::default recipe has no resources and should not be included in a run_list. See the README.md file for a description of each recipe.')
