@@ -12,5 +12,5 @@ platforms:
 suites:
   - name: default
     run_list:
-      - recipe[W2K12R2_IIS::default]
+      - recipe[PSModules::default]
     attributes:
