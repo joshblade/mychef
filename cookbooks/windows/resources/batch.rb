@@ -1,10 +1,8 @@
 #
-# Author:: Doug MacEachern (<dougm@vmware.com>)
 # Author:: Seth Chisamore (<schisamo@chef.io>)
 # Cookbook Name:: windows
-# Resource:: zipfile
+# Resource:: batch
 #
-# Copyright:: 2010, VMware, Inc.
 # Copyright:: 2011-2015, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -20,14 +18,24 @@
 # limitations under the License.
 #
 
-actions :unzip, :zip
+actions :run
 
-attribute :path, kind_of: String, name_attribute: true
-attribute :source, kind_of: String
-attribute :overwrite, kind_of: [TrueClass, FalseClass], default: false
-attribute :checksum, kind_of: String
+attribute :command, kind_of: String, name_attribute: true
+attribute :cwd, kind_of: String, default: nil
+attribute :code, kind_of: String, default: nil
+attribute :user, kind_of: [String, Integer], default: nil
+attribute :group, kind_of: [String, Integer], default: nil
+attribute :creates, kind_of: [String], default: nil
+attribute :flags, kind_of: [String], default: nil
+attribute :returns, kind_of: [Integer, Array], default: 0
 
 def initialize(name, run_context = nil)
   super
-  @action = :unzip
+  @action = :run
+  @command = name
+  Chef::Log.warn <<-EOF
+Please use the batch resource in Chef Client 11 and 12.
+windows_batch will be removed in the next major version release
+of the Windows cookbook.
+EOF
 end
