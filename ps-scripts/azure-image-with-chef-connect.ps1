@@ -104,7 +104,7 @@ $fqdn = (Get-AzureRmPublicIpAddress -ResourceGroupName $devOpsResourceGroup).Dns
 #########Works
 start-sleep -Seconds 60
 $chefSession = New-SSHSession -ComputerName 13.82.187.74 -Credential $cred -Force
-$cmds = 'cd /home/devopsadmin/chef-starter/.chef', "knife bootstrap windows winrm $server -x \devopsadmin -P Password123$ --node-name $server --run-list ''recipe[PSModules]''"
+$cmds = 'cd /home/devopsadmin/chef-starter/.chef', "knife bootstrap windows winrm $server -x \devopsadmin -P Password123$ --node-name $server --run-list ''recipe[PSModules]','recipe[W2K12R2_IIS]''"
 $chefSetup = Invoke-SSHCommand -SSHSession $chefSession -Command ($cmds -join ';')
 
 #########
