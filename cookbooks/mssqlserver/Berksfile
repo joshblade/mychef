@@ -1,0 +1,9 @@
+source "https://supermarket.chef.io"
+
+
+
+metadata
+
+cookbook 'windows', '= 2.0.2'
+cookbook 'ms_dotnet35'
+cookbook 'ec2helper', path: '../ec2helper'

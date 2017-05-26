@@ -1,9 +1,9 @@
 #
 # Author:: Julian C. Dunn (<jdunn@chef.io>)
-# Cookbook Name:: powershell
+# Cookbook:: powershell
 # Recipe:: powershell4
 #
-# Copyright:: Copyright (c) 2014 Chef Software, Inc.
+# Copyright:: 2014-2016, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -21,7 +21,7 @@
 # PowerShell 4.0 Download Page
 # http://www.microsoft.com/en-us/download/details.aspx?id=40855
 
-if node['platform'] == 'windows'
+if platform_family?('windows')
 
   nt_version = ::Windows::VersionHelper.nt_version(node)
   # WMF 4.0 is only compatible with:
@@ -42,10 +42,10 @@ if node['platform'] == 'windows'
       installer_type :custom
       options '/quiet /norestart'
       action :install
-      success_codes [0, 42, 127, 3010, 2_359_302]
+      returns [0, 42, 127, 3010, 2_359_302]
       # Note that the :immediately is to immediately notify the other resource,
       # not to immediately reboot. The windows_reboot 'notifies' does that.
-      notifies :request, 'windows_reboot[powershell]', :immediately if reboot_pending? && node['powershell']['installation_reboot_mode'] != 'no_reboot'
+      notifies :reboot_now, 'reboot[powershell]', :immediately if node['powershell']['installation_reboot_mode'] != 'no_reboot'
       not_if { ::Powershell::VersionHelper.powershell_version?('4.0') }
     end
   else

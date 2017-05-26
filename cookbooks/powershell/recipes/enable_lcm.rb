@@ -1,9 +1,9 @@
 #
 # Author:: Aliasgar Batterywala (<aliasgar.batterywala@clogeny.com>)
-# Cookbook Name:: powershell
+# Cookbook:: powershell
 # Recipe:: enable_lcm
 #
-# Copyright:: Copyright (c) 2015 Chef Software, Inc.
+# Copyright:: 2015-2016, Chef Software, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -17,10 +17,9 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-include_recipe 'powershell::dsc'
+if platform_family?('windows')
 
-case node['platform']
-when 'windows'
+  include_recipe 'powershell::dsc'
 
   directory 'Creating temporary directory to store LCM MOF files' do
     path node['lcm']['mof']['temp_dir']

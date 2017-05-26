@@ -1,0 +1,18 @@
+DEPENDENCIES
+  ec2helper
+    path: ../ec2helper
+  ms_dotnet35
+  mssqlserver
+    path: .
+    metadata: true
+  windows (= 2.0.2)
+
+GRAPH
+  ec2helper (1.0.23)
+  ms_dotnet35 (3.2.0)
+    windows (>= 0.0.0)
+  mssqlserver (0.1.0)
+    ec2helper (>= 0.0.0)
+    ms_dotnet35 (>= 0.0.0)
+    windows (= 2.0.2)
+  windows (2.0.2)
