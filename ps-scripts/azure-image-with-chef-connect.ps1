@@ -1,11 +1,12 @@
 #Title: SBX Azure system Deployment
 #Description: Powershell script to deploy a new Azure based SBX server that will connect to Azure DB as a Service
+#Date: Monday, May 29, 2017 10:48:43 PM
 #region Login
 $reiAzureLoginCreds = get-credential -Message 'Your.Name@reisystems.com and your reisystems password' -UserName robert.burke@reisystems.com
 Login-AzureRmAccount -Credential $reiAzureLoginCreds 
 #endregion
 #region ################Variable Declaration################
-$server = 'rei-azure-ehb10'
+$server = 'rei-azure-ehb30'
 $devOpsResourceGroup = 'rg-devops'
 $devopsEastStorage = 'reidevopsstorage'
 $location = 'EastUS'
@@ -98,26 +99,21 @@ Add-AzureRmVMNetworkInterface -Id $nic.Id
 
 New-AzureRmVM -ResourceGroupName $devOpsResourceGroup -Location $location -VM $vmconfig -Verbose
 #endregion
-$fqdn = (Get-AzureRmPublicIpAddress -ResourceGroupName $devOpsResourceGroup).DnsSettings.Fqdn | Select-String -SimpleMatch $server
-#Chef server IP address 13.82.187.74
 
+
+#region Logs into the unbuntu server via ssh and executes a bootstrap against the newly defined machine
 #########Works
-start-sleep -Seconds 60
+#Start-Sleep -Seconds 60
+#Chef server IP address 13.82.187.74
 $chefSession = New-SSHSession -ComputerName 13.82.187.74 -Credential $cred -Force
-$cmds = 'cd /home/devopsadmin/chef-starter/.chef', "knife bootstrap windows winrm $server -x \devopsadmin -P Password123$ --node-name $server --run-list ''recipe[PSModules]','recipe[W2K12R2_IIS]''"
-$chefSetup = Invoke-SSHCommand -SSHSession $chefSession -Command ($cmds -join ';')
-
-#########
-<#
-#region Chef Setup
-$clientRBPath = 'D:\Documents\Chef-Test\new-azure-hrsa\client.rb'
-$orgValidationPemPath = 'D:\Documents\Chef-Test\new-azure-hrsa\rei-validator.pem'
-$chefServerUrl = 'https://UbuntuChef.l0xbnfzrdm3ehngkkqtioig1vd.bx.internal.cloudapp.net/organizations/rei'
-Set-AzureRmVMChefExtension -ResourceGroupName $devOpsResourceGroup -VMName $server -Location $location -ClientRb $clientRBPath -ValidationPem $orgValidationPemPath -ChefServerUrl $chefServerUrl -ChefDaemonInterval 15 -RunList 'ad-pdc'  -Windows
+$cmds = 'cd /home/devopsadmin/chef-starter/.chef', "knife bootstrap windows winrm $server -x \devopsadmin -P Password123$ --node-name $server --run-list ''recipe[windows]','recipe[PSModules]','recipe[W2K12R2_IIS]','recipe[testehb]','recipe[common_installs]''"
+$chefSetup = Invoke-SSHCommand -SSHSession $chefSession -Command ($cmds -join ';') -Verbose
+$chefSetup.ExitStatus
 #endregion
-#>
+#########
 
 #region Display IIS default webpage on new server
+$fqdn = (Get-AzureRmPublicIpAddress -ResourceGroupName $devOpsResourceGroup).DnsSettings.Fqdn | Select-String -SimpleMatch $server
 Invoke-Command -scriptblock {
     $ie = New-Object -ComObject InternetExplorer.Application
     $ie.Visible = $true
@@ -125,4 +121,3 @@ Invoke-Command -scriptblock {
 }
 #endregion
 
-#-ValidationPem "C:\my-org-validator.pem" -ClientRb "C:\client.rb"
