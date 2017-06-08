@@ -1,9 +1,11 @@
 #
 # Cookbook:: ehb-is
 # Recipe:: default
-#
+#Description:: This cookbook configures the EHB-IS server except for software installs which is contained in common_installs
 # Copyright:: 2017, The Authors, All Rights Reserved.
 #Depends on common_installs
+
+
 #Add users and assign to required groups
 user "gemsapp" do
   password "#GemsUser1"
@@ -55,13 +57,15 @@ group "Power Users" do
   append true
 end
 
+#Windows Service Management
+
 windows_service 'WerSvc' do
   action :stop
   action :configure_startup
   startup_type :disabled
 end
 
-#Features
+#Install of Windows Features
 
 windows_feature 'IIS-WebServerRole' do
    action :install
@@ -145,7 +149,7 @@ end
 
 windows_feature 'RSAT' do
    action :install
-   all true
+   #all true
    install_method :windows_feature_powershell
 end
 
@@ -197,6 +201,7 @@ end
 windows_feature 'Web-Health' do
    action :install
    install_method :windows_feature_powershell
+   all true 
 end
 
 windows_feature 'RSAT-SNMP' do
@@ -223,6 +228,7 @@ end
 windows_feature 'Web-Security' do
    action :install
    install_method :windows_feature_powershell
+   all true
 end
 
 windows_feature 'Web-Asp-Net' do
@@ -398,6 +404,7 @@ end
 windows_feature 'AS-Dist-Transaction' do
    action :install
    install_method :windows_feature_powershell
+   all true
 end
 
 windows_feature 'AS-Web-Support' do
@@ -413,4 +420,20 @@ end
 windows_feature 'AS-HTTP-Activation' do
    action :install
    install_method :windows_feature_powershell
+end
+
+##############################################################
+
+#File and Directory creation
+
+directory 'd:\Temp' do
+    action :create
+end
+
+directory 'd:\Gems_Backup' do
+    action :create
+end
+
+directory 'd:\Logs' do
+    action :create
 end

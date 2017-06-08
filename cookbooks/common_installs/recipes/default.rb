@@ -1,11 +1,11 @@
 #
 # Cookbook:: common_installs
 # Recipe:: default
-#
+# ?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D
 # Copyright:: 2017, The Authors, All Rights Reserved.
 
 remote_file 'D:\ehbs\7z920-x64.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/7z920-x64.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/7z920-x64.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\7z920-x64.msi')}
 end
@@ -19,7 +19,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\SQLSysClrTypes.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/ReportViewer2012-SQL-CLR/SQLSysClrTypes.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/ReportViewer2012-SQL-CLR/SQLSysClrTypes.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\SQLSysClrTypes.msi')}
 end
@@ -33,7 +33,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\ReportViewer.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/ReportViewer2012-SQL-CLR/ReportViewer.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/ReportViewer2012-SQL-CLR/ReportViewer.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\ReportViewer.msi')}
 end
@@ -47,7 +47,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\SQLServer2012_PerformanceDashboard.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/SQLServer2012_PerformanceDashboard.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/SQLServer2012_PerformanceDashboard.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\SQLServer2012_PerformanceDashboard.msi')}
 end
@@ -61,7 +61,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\msxml6_x64.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/msxml6_x64.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/msxml6_x64.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\msxml6_x64.msi')}
 end
@@ -74,22 +74,8 @@ end
 
 ##############################################################
 
-remote_file 'D:\ehbs\WSE-20-SP3-Runtime.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/WSE-20-SP3-Runtime.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
-  action :create
-  not_if {::File.exists?('D:\ehbs\WSE-20-SP3-Runtime.msi')}
-end
-
-windows_package 'WSE20SP3' do
-  action :install
-  source 'D:\ehbs\WSE-20-SP3-Runtime.msi'
-  #not_if {::File.exists?('C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Performance Dashboard\setup.sql')}
-end
-
-##############################################################
-
 remote_file 'D:\ehbs\WSE-30.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/WSE-30.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/WSE-30.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\WSE-30.msi')}
 end
@@ -103,7 +89,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\sqlxml_x64.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/sqlxml_x64.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/sqlxml_x64.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\sqlxml_x64.msi')}
 end
@@ -117,7 +103,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\SQLServer2005_ASOLEDB9_x64.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/SQLServer2005_ASOLEDB9_x64.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/SQLServer2005_ASOLEDB9_x64.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\SQLServer2005_ASOLEDB9_x64.msi')}
 end
@@ -131,7 +117,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\SQL_AS_ADOMD.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/SQL_AS_ADOMD.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/SQL_AS_ADOMD.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\SQL_AS_ADOMD.msi')}
 end
@@ -145,7 +131,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\SQL_AS_OLEDB.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/SQL_AS_OLEDB.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/SQL_AS_OLEDB.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\SQL_AS_OLEDB.msi')}
 end
@@ -159,7 +145,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\ASPAJAXExtSetup.msi' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/ASPAJAXExtSetup.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/ASPAJAXExtSetup.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\ASPAJAXExtSetup.msi')}
 end
@@ -173,7 +159,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\AccessDatabaseEngine_x64.exe' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/AccessDatabaseEngine_x64.exe?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/AccessDatabaseEngine_x64.exe?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\AccessDatabaseEngine_x64.exe')}
 end
@@ -192,7 +178,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\owc11.exe' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/owc11.exe?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/owc11.exe?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\owc11.exe')}
 end
@@ -212,7 +198,7 @@ end
 ##############################################################
 
 remote_file 'D:\ehbs\ReportViewer2008SP1.exe' do
-  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/ReportViewer2008SP1.exe?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-07-04T18:15:48Z&st=2017-06-06T10:15:48Z&spr=https&sig=JGXviFQxlDZmciCceQI73RusBjbh1YWZH%2FEOi62c7Rc%3D'
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/ReportViewer2008SP1.exe?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
   action :create
   not_if {::File.exists?('D:\ehbs\ReportViewer2008SP1.exe')}
 end
@@ -221,10 +207,25 @@ end
 execute 'ReportViewer2008SP1Install' do
   command 'D:\ehbs\ReportViewer2008SP1.exe /q'
 end
-#windows_package 'owc11' do
+
+##############################################################
+
+remote_file 'D:\ehbs\MicrosoftWSE20SP3Runtime.msi' do
+  source 'https://reidevopsstorage.file.core.windows.net/ise/prerequisites/MicrosoftWSE20SP3Runtime.msi?sv=2016-05-31&ss=bfqt&srt=sco&sp=rwdlacup&se=2017-08-31T00:11:44Z&st=2017-06-07T16:11:44Z&spr=https,http&sig=nhQ4soa1rkT5I9iy6V%2B9WfdbLSd1EMRdC3zJIuIKnLA%3D'
+  action :create
+  not_if {::File.exists?('D:\ehbs\MicrosoftWSE20SP3Runtime.msi')}
+end
+
+
+
+execute 'WSE20SP3Install' do
+  command 'D:\ehbs\MicrosoftWSE20SP3Runtime.msi /quiet'
+end
+
+#windows_package 'WSE20SP3' do
 #  action :install
- # source 'D:\ehbs\ReportViewer2008SP1.exe'
-  #not_if {::File.exists?('C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Performance Dashboard\setup.sql')}
- # installer_type :custom
- # options '/quiet'
+#  source 'D:\ehbs\MicrosoftWSE20SP3Runtime.msi'
+#  #not_if {::File.exists?('C:\Program Files (x86)\Microsoft SQL Server\110\Tools\Performance Dashboard\setup.sql')}
 #end
+
+##############################################################

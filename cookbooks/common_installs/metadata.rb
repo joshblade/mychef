@@ -2,7 +2,7 @@ name 'common_installs'
 maintainer 'The Authors'
 maintainer_email 'you@example.com'
 license 'All Rights Reserved'
-description 'Installs/Configures common_installs'
+description 'Installs/Configures common software requirements(PreReqs)'
 long_description 'Installs/Configures common_installs'
 version '0.1.0'
 chef_version '>= 12.1' if respond_to?(:chef_version)
