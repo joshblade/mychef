@@ -1,0 +1,8 @@
+[ClassVersion("1.0.0.0"), FriendlyName("AssemblyManager")]
+class cAssemblyManager : OMI_BaseResource
+{
+	[Key] String AssemblyName;
+	[Write] String GACInstallPath;
+	[Key] String AssemblyLocationPath;
+	[Required, ValueMap{"Present","Absent"}, Values{"Present","Absent"}] String Ensure;
+};

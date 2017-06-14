@@ -1,0 +1,1353 @@
+﻿Configuration TATSConfig{
+
+    Install-Module "xPSDesiredStateConfiguration" -MinimumVersion "3.0.3.4"
+    Import-module -Name @{ModuleName="xWebAdministration";ModuleVersion="1.6.0.0"}
+    #Import-DscResource -ModuleName @{ModuleName="xPSDesiredStateConfiguration";ModuleVersion="3.4.0.0"}
+    Import-DscResource -ModuleName "xPSDesiredStateConfiguration" 
+    Import-DscResource -ModuleName "cIISBaseConfig" 
+    Import-DscResource -ModuleName "cWebAdministration" 
+    Import-DscResource -ModuleName @{ModuleName="PSDesiredStateConfiguration";ModuleVersion="1.1"} 
+    Import-DscResource -ModuleName "xWebAdministration" 
+    Import-DscResource -ModuleName "xSMTP"
+    Import-DscResource -ModuleName "xSMBShare"
+    Import-module -name "webadministration"
+    Import-DscResource -ModuleName "xTimeZone"
+    Import-DscResource -ModuleName "xRemoteDesktopAdmin"
+
+         Node $AllNodes.Where{$_.OS -eq $true}.NodeName 
+    {
+##########USER CONFIG        
+               
+       User ehbssas 
+       {
+            Ensure = 'Present'
+            UserName = 'ehbssas'
+            Password = $SSASCredential
+            FullName = 'EHBSSAS'
+            PasswordNeverExpires = $true
+       }  
+       #OS  
+        User ehbsqlsa 
+       {
+       Ensure = 'Present'
+       UserName = 'ehbsqlsa'
+       Password = $SQLCredential
+       FullName = 'EHBSQLSA'
+       PasswordNeverExpires = $true
+       }
+       #OS
+       xGroup Administrators
+       { 
+       Ensure = 'Present'
+       GroupName = 'Administrators'
+       MembersToInclude = 'gemsapp','ehbssas','ehbsqlsa','reisys\ehrsa-cm', 'reisys\hrsa-cm'
+       DependsOn = '[User]gemsapp','[User]ehbssas'
+       Credential = $verifyCredential
+       }
+
+##########FILE CONFIG
+        File Temp
+        {
+            Ensure = 'Present'
+            DestinationPath = 'y:\Temp'
+            Type = 'Directory'
+        }        
+        File Logs 
+        {
+            Ensure = "Present"
+            Type = "Directory"
+            DestinationPath = "Y:\Logs"
+        } 
+        File LogFilesW3CSVC
+        {
+            Ensure = 'Present'
+            DestinationPath = 'Y:\Privateroot\LogFiles\W3CSVC'
+            Type = 'Directory'
+        }    
+        File PrivateRoot
+        {
+            Ensure = 'Present'
+            DestinationPath = 'Y:\Privateroot'
+            Type = 'Directory'
+        }
+        File RootCopy
+        {
+            Ensure = 'Present'
+            Type = 'Directory'
+            Recurse = $true
+            SourcePath = '\\hrsafs\ISE\Prerequisites\Root'
+            DestinationPath = 'Y:\Root'
+        }
+        
+        File ntrightscheck 
+        {
+            Type = "File"
+            DestinationPath = "\\hrsafs\ise\Tools\ntrights.exe"
+            Ensure = "Present"
+        }
+        File SAFileUpcheck 
+        {
+            Ensure = 'Present'
+            Type = "Directory"
+            Recurse = $true
+            SourcePath = "\\hrsafs\ise\Prerequisites\SAFileUp_5.3.2.68"
+            DestinationPath = "Y:\SAFileUp_5.3.2.68"
+         }
+         File F5XForwardedFor 
+        {
+            Ensure = 'Present'
+            Type = "Directory"
+            Recurse = $true
+            SourcePath = '\\hrsafs\ise\Prerequisites\IIS_Rewrite_64\IIS_Rewrite'
+            DestinationPath = "Y:\F5XForwardedFor"
+         }
+#####################
+         NTFSPermission gemsappYTemp{
+            Account = "gemsapp"
+            Path = "y:\temp"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "FullControl"
+       }
+##########FILE PERMISSIONS
+        NTFSPermission usersYlogs{
+            Account = "users"
+            Path = "y:\logs"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "FullControl"
+       }
+
+        NTFSPermission everyoneprivateroot{
+            Account = "everyone"
+            Path = "y:\privateroot"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "FullControl"
+       }
+        NTFSPermission users2010{
+            Account = "users"
+            Path = "Y:\Privateroot\2010"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "readandexecute"
+       }
+        NTFSPermission usersEIS_v2{
+            Account = "users"
+            Path = "Y:\Privateroot\EIS_v2"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "readandexecute"
+       }
+        NTFSPermission usersTestEIS_v2{
+            Account = "users"
+            Path = "Y:\Privateroot\TestEIS_v2"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "readandexecute"
+       }
+        NTFSPermission usersTemp{
+            Account = "users"
+            Path = "Y:\temp"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "FullControl"
+       }
+        NTFSPermission usersCTemp{
+            Account = "users"
+            Path = "C:\Windows\Temp"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "FullControl"
+       }
+        NTFSPermission usersUploadedFiles{
+            Account = "users"
+            Path = "Y:\UploadedFiles"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "Modify"
+       }
+        NTFSPermission UsersDownloadedFiles{
+            Account = "users"
+            Path = "Y:\DownloadedFiles"
+            Access = "Allow"
+            Ensure = "Present"
+            Rights = "Modify"
+       }
+#################SHARE
+       xSmbShare Privateroot
+       {
+            Ensure = "Present" #Or absent to remove
+            Name = "Privateroot" #Sharename
+            Path = "Y:\Privateroot" #Physical Path
+            ChangeAccess = "Everyone"
+            #ReadAccess = "Everyone"
+            #FullAccess = "User"
+            Description = "File share located on web server normally"
+       }
+       xSmbShare Logs
+       {
+            Ensure = "Present" #Or absent to remove
+            Name = "Logs" #Sharename
+            Path = "Y:\Logs" #Physical Path
+            #ChangeAccess = "Everyone"
+            ReadAccess = "Everyone"
+            #FullAccess = "User"
+            Description = "File share located on web server normally"
+       }
+#################FEATURES AND ROLES
+       WindowsFeature ApplicationServer
+       {
+            Ensure = “Present” 
+            Name = "Application-Server"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature ASNetFramework
+       {
+            Ensure = “Present” 
+            Name = "AS-Net-Framework"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature ASEntServices
+       {
+            Ensure = “Present” 
+            Name = "AS-Ent-Services"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature ASDistTransaction
+       {
+            Ensure = “Present” 
+            Name = "AS-Dist-Transaction"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+            IncludeAllSubFeature = $true
+       }
+       WindowsFeature ASWebSupport
+       {
+            Ensure = “Present” 
+            Name = "AS-Web-Support"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature ASWASSupport
+       {
+            Ensure = “Present” 
+            Name = "AS-WAS-Support"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature ASHTTPActivation
+       {
+            Ensure = “Present” 
+            Name = "AS-HTTP-Activation"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature FileAndStorageServices     
+       {       
+            Ensure = “Present” 
+            Name = "FileAndStorage-Services"
+       }
+       WindowsFeature FileServices     
+       {       
+            Ensure = “Present” 
+            Name = "File-Services"
+       }
+       WindowsFeature StorageServices     
+       {       
+            Ensure = “Present” 
+            Name = "Storage-Services"
+       }
+       WindowsFeature FSFileServer
+       {
+            Ensure = “Present” 
+            Name = "FS-FileServer"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature IIS     
+       {       
+            Ensure = “Present”       
+            Name = “Web-Server”
+            #IncludeAllSubFeature = $true
+       }
+       WindowsFeature WebWebServer     
+       {       
+            Ensure = “Present”       
+            Name = “Web-WebServer”
+            #IncludeAllSubFeature = $true
+                 
+       }
+       WindowsFeature WebCommonHttp    
+       {       
+            Ensure = “Present”       
+            Name = “Web-Common-Http”     
+       }
+       WindowsFeature WebDefaultDoc
+       {
+            Ensure = "Present"
+            Name = "Web-Default-Doc"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature WebDirBrowsing    
+       {       
+            Ensure = “Present”       
+            Name = “Web-Dir-Browsing”     
+       }
+        WindowsFeature WebHttpErrors    
+       {       
+            Ensure = “Present” 
+            Name = "Web-Http-Errors"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature WebStaticContent    
+       {       
+            Ensure = “Present” 
+            Name = "Web-Static-Content"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature HTTPRedirect    
+       {       
+            Ensure = “Present”       
+            Name = “Web-Http-Redirect”     
+       }
+       WindowsFeature WebHealth  
+       {  
+            Ensure = "Present"  
+            Name = "Web-Health"
+            #IncludeAllSubFeature = $true 
+       }
+       WindowsFeature WebHttpLogging  
+       {  
+            Ensure = "Present"  
+            Name = "Web-Http-Logging"
+            #IncludeAllSubFeature = $true 
+       }
+       WindowsFeature WebLogLibraries  
+       {  
+            Ensure = "Present"  
+            Name = "Web-Log-Libraries"
+            #IncludeAllSubFeature = $true 
+       }
+       WindowsFeature WebRequestmonitor  
+       {  
+            Ensure = "Present"  
+            Name = "Web-Request-monitor"
+            #IncludeAllSubFeature = $true 
+       }
+       WindowsFeature WebHttpTracing  
+       {  
+            Ensure = "Present"  
+            Name = "Web-Http-Tracing"
+            #IncludeAllSubFeature = $true 
+       }
+       WindowsFeature WebPerformance  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Performance"
+            IncludeAllSubFeature = $true 
+        }
+        WindowsFeature WebSecurity  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Security"
+            IncludeAllSubFeature = $true 
+        }
+        WindowsFeature WebFiltering  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Filtering" 
+        }
+        WindowsFeature WebBasicAuth  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Basic-Auth" 
+        }
+        WindowsFeature WebClientAuth  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Client-Auth" 
+        }
+        WindowsFeature WebDigestAuth  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Digest-Auth" 
+        }
+        WindowsFeature WebIPSecurity  
+        {  
+            Ensure = "Present"  
+            Name = "Web-IP-Security" 
+        }
+        WindowsFeature WebCertAuth  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Cert-Auth" 
+        }
+        WindowsFeature WebUrlAuth  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Url-Auth" 
+        }
+        WindowsFeature WebWindowsAuth  
+        {  
+            Ensure = "Present"  
+            Name = "Web-Windows-Auth" 
+        }
+        WindowsFeature WebAppDev    
+        {       
+            Ensure = “Present”       
+            Name = “Web-App-Dev”     
+        }
+        WindowsFeature WebNetExt    
+        {       
+            Ensure = “Present”       
+            Name = “Web-Net-Ext”     
+        }
+        WindowsFeature WebNetExt45    
+        {       
+            Ensure = “Present”       
+            Name = “Web-Net-Ext45”     
+        }
+        WindowsFeature WebAsp    
+        {       
+            Ensure = “Present”       
+            Name = “Web-Asp”     
+        }
+        WindowsFeature WebAspNet    
+        {       
+            Ensure = “Present”       
+            Name = “Web-Asp-Net”     
+        }
+        WindowsFeature WebAspNet45    
+        {       
+            Ensure = “Present”       
+            Name = “Web-Asp-Net45”     
+        }
+        WindowsFeature WebISAPIExt    
+        {       
+            Ensure = “Present”       
+            Name = “Web-ISAPI-Ext”     
+        }
+        WindowsFeature WebISAPIFilter    
+        {       
+            Ensure = “Present”       
+            Name = “Web-ISAPI-Filter”     
+        }
+        WindowsFeature IISManagementConsole     
+       {       
+            Ensure = “Present”       
+            Name = “Web-Mgmt-Console”
+            #IncludeAllSubFeature = $true
+                 
+       }
+       WindowsFeature IISScriptingTools     
+        {       
+            Ensure = “Present”       
+            Name = “Web-Scripting-Tools”
+            #IncludeAllSubFeature = $true
+                 
+        }
+        WindowsFeature WDS
+        {
+            Ensure = "Present"
+            Name = "WDS"
+            IncludeAllSubFeature = $true
+        }
+        WindowsFeature NETFW35    
+       {       
+            Ensure = “Present” 
+            Name = "NET-Framework-Features"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature NETFrameworkCore    
+        {       
+            Ensure = “Present”       
+            Name = “NET-Framework-Core”
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"    
+        }
+        WindowsFeature NETFW35HTTPActivation    
+       {       
+            Ensure = “Present” 
+            Name = "NET-HTTP-Activation"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature NETFW45     
+       {       
+            Ensure = “Present” 
+            Name = "NET-Framework-45-Features"
+       }
+       WindowsFeature NETFramework45Core    
+       {       
+            Ensure = “Present”       
+            Name = “NET-Framework-45-Core”
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"     
+       }
+       WindowsFeature NETFramework45ASPNET    
+       {       
+            Ensure = “Present”       
+            Name = “NET-Framework-45-ASPNET”
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"     
+       }
+       WindowsFeature NETWCFTCPPortSharing45     
+       {       
+            Ensure = “Present” 
+            Name = "NET-WCF-TCP-PortSharing45"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature MSMQ
+        {
+            Ensure = "Present"
+            Name = "MSMQ"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+        }
+        WindowsFeature MSMQServices
+        {
+            Ensure = "Present"
+            Name = "MSMQ-Services"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+        }
+        WindowsFeature MSMQServer
+        {
+            Ensure = "Present"
+            Name = "MSMQ-Server"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+        }
+        WindowsFeature RSAT     
+        {       
+            Ensure = “Present”       
+            Name = “RSAT”
+            #IncludeAllSubFeature = $true
+                 
+        }
+        WindowsFeature RSATFeatureTools     
+        {       
+            Ensure = “Present”       
+            Name = “RSAT-Feature-Tools”
+            #IncludeAllSubFeature = $true
+                 
+        }
+        WindowsFeature RSATSNMP     
+        {       
+            Ensure = “Present”       
+            Name = “RSAT-SNMP”
+            #IncludeAllSubFeature = $true
+                 
+        }
+        WindowsFeature WDSAdminPack     
+        {       
+            Ensure = “Present”       
+            Name = “WDS-AdminPack”
+         
+        }
+        WindowsFeature SNMP     
+        {       
+            Ensure = “Present” 
+            Name = "SNMP-Service"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+            IncludeAllSubFeature = $true
+        }
+        
+        WindowsFeature TelnetClient     
+        {       
+            Ensure = “Present” 
+            Name = "Telnet-Client"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+            IncludeAllSubFeature = $true
+        }
+        WindowsFeature ServerGuiMgmtInfra     
+       {       
+            Ensure = “Present” 
+            Name = "Server-Gui-Mgmt-Infra"
+       }
+       WindowsFeature ServerGuiShell    
+       {       
+            Ensure = “Present” 
+            Name = "Server-Gui-Shell"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+        WindowsFeature PowerShellRoot    
+       {       
+            Ensure = “Present” 
+            Name = "PowerShellRoot"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature PowerShell    
+       {       
+            Ensure = “Present” 
+            Name = "PowerShell"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature PowerShellV2   
+       {       
+            Ensure = “Present” 
+            Name = "PowerShell-V2"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature PowerShellISE   
+       {       
+            Ensure = “Present” 
+            Name = "PowerShell-ISE"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+       }
+       WindowsFeature WAS   
+       {       
+            Ensure = “Present” 
+            Name = "WAS"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+            IncludeAllSubFeature = $true
+       }
+       WindowsFeature WinRMIISExt   
+       {       
+            Ensure = “Present” 
+            Name = "WinRM-IIS-Ext"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+            #IncludeAllSubFeature = $true
+       }
+       WindowsFeature WoW64Support   
+       {       
+            Ensure = “Present” 
+            Name = "WoW64-Support"
+            Source = "\\hrsafs\ise\2012r2_Source\sxs"
+            #IncludeAllSubFeature = $true
+       }
+       Environment REIConfigLocationHRSA
+        {
+         Ensure = "Present"
+         Name = "REIConfigLocationHRSA"
+         Value = "\\New-HRSABuild.reisys.com\ConfigurationData"
+         #Prod Value = "\\GEMSFS1\ConfigurationData"
+        }
+        script LogonAsAServiceGems 
+        {
+         Setscript ={
+         $ntrights = "\\hrsafs\ise\Tools\ntrights.exe"
+         $machine = $Env:computerName
+         Invoke-expression ("$ntrights -u gemsapp +r SeServiceLogonRight -m \\$machine")
+        }
+         TestScript = "Test-Path -path '\\hrsafs\ise\Tools\mytest.exe'"
+         Getscript = {@(pathtest = (Test-Path -Path $ntrights))}
+         DependsOn = '[File]ntrightscheck'
+        }
+        Package WSE2SP3
+        {
+            Ensure = "Present"  # You can also set Ensure to "Absent"
+            Path  = "\\hrsafs\ISE\Prerequisites\WSE 2.0 SP3 Runtime.msi"
+            Name = "Microsoft WSE 2.0 SP3 Runtime"
+            ProductId = "F3CA9611-CD42-4562-ADAB-A554CF8E17F1"
+        }
+        Package ReportViewer2005
+        {
+            #ReportViewer
+            Ensure = "Present"
+            Name = "Microsoft Report Viewer Redistributable 2005"
+            Path = '\\hrsafs\ISE\Prerequisites\reportviewer2005\install.exe'
+            ProductId = '7635D07D-B727-496F-94CA-8AC60E0C40CE'
+            Arguments = '/q"'
+        }
+
+        #########IIS Default Settings   
+        cAppHostKeyValue  queueLength
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            #ConfigSection = "appsettings"
+            ConfigSection = "/system.applicationHost/applicationPools/applicationPoolDefaults"
+            Key = "queueLength"
+            Value = "10000"
+            IsAttribute = $true
+        }        
+        cAppHostKeyValue managedRuntimeVersion
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"            
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults"
+            Key = "managedRuntimeVersion"
+            Value = "v4.0"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue startMode
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"            
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults"
+            Key = "startMode"
+            Value = "AlwaysRunning"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue logontype
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/processModel"
+            Key = "logontype"
+            Value = "logonbatch"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue processModelIdleTimeout
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/processModel"
+            Key = "idleTimeout"
+            Value = "01:00:00"
+            IsAttribute = $true
+        }    
+        cAppHostKeyValue processModelidleTimeoutAction
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/processModel"
+            Key = "idleTimeoutAction"
+            Value = "Suspend"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue processModelshutdownTimeLimit
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/processModel"
+            Key = "shutdownTimeLimit"
+            Value = "00:02:30"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue processModelstartupTimeLimit
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/processModel"
+            Key = "startupTimeLimit"
+            Value = "00:02:30"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue logEventOnRecycle
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/recycling"
+            Key = "logEventOnRecycle"
+            Value = "Time,Requests,Schedule,Memory,IsapiUnhealthy,OnDemand,ConfigChange,PrivateMemory"
+            IsAttribute = $true
+        }
+
+        
+        cAppHostKeyValue privateMemory
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/recycling/periodicRestart"
+            Key = "privateMemory"
+            Value = "1048576"
+            IsAttribute = $true
+        }
+        
+        cAppHostKeyValue periodicRestartTime
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/recycling/periodicRestart"
+            Key = "time"
+            Value = "00:00:00"
+            IsAttribute = $true
+        }
+        
+        cAppHostKeyValue rapidFailProtection
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/failure"
+            Key = "rapidFailProtection"
+            Value = "false"
+            IsAttribute = $true
+        }
+        
+        cAppHostKeyValue resetInterval
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/applicationPools/applicationPoolDefaults/cpu"
+            Key = "resetInterval"
+            Value = "00:15:00"
+            IsAttribute = $true
+        }
+                       
+        cAppHostKeyValue centralLogFileMode
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/log"
+            Key = "centralLogFileMode"
+            Value = "CentralW3C"
+            IsAttribute = $true
+        }
+
+        Script centralBinaryLogFileEnabled
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/log/centralBinaryLogFile -Name "enabled" -Value "False"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralBinaryLogFile -Name enabled) -ieq "False"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralBinaryLogFile -Name enabled) -ieq "False")}
+         }
+        
+        Script centralBinaryLogFiledirectory
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/log/centralBinaryLogFile -Name "directory" -Value "Y:\Privateroot\LogFiles"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralBinaryLogFile -Name directory) -ieq "Y:\Privateroot\LogFiles"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralBinaryLogFile -Name directory) -ieq "Y:\Privateroot\LogFiles")}
+         }
+         <#             
+        cAppHostKeyValue centralBinaryLogFiledirectory
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/log/centralBinaryLogFile"
+            Key = "directory"
+            Value = "Y:\Privateroot\LogFiles"
+            IsAttribute = $true
+        }
+         #>
+        Script centralBinaryLogFiletruncateSize
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/log/centralBinaryLogFile -Name "truncateSize" -Value "1073741824"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralBinaryLogFile -Name truncateSize) -ieq "1073741824"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralBinaryLogFile -Name truncateSize) -ieq "1073741824")}
+         }
+
+        Script centralBinaryLogFilelocalTimeRollover
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/log/centralBinaryLogFile -Name "localTimeRollover" -Value "True"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralBinaryLogFile -Name localTimeRollover) -ieq "True"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralBinaryLogFile -Name localTimeRollover) -ieq "True")}
+         }       
+               
+        cAppHostKeyValue centralW3CLogFilelocalTimeRollover
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/log/centralW3CLogFile"
+            Key = "localTimeRollover"
+            Value = "True"
+            IsAttribute = $true
+        }         
+        cAppHostKeyValue centralW3CLogFileEnabled
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/log/centralW3CLogFile"
+            Key = "Enabled"
+            Value = "True"
+            IsAttribute = $true
+        }
+        Script centralW3CLogFileDir
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/log/centralW3CLogFile -Name "directory" -Value "Y:\Privateroot\LogFiles"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralW3CLogFile -Name directory) -ieq "Y:\Privateroot\LogFiles"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/log/centralW3CLogFile -Name directory) -ieq "Y:\Privateroot\LogFiles")}
+         }  
+        cAppHostKeyValue centralW3CLogFiletruncateSize
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/log/centralW3CLogFile"
+            Key = "truncateSize"
+            Value = "1073741824"
+            IsAttribute = $true
+        }       
+         cAppHostKeyValue centralW3CLogFilelogExtFileFlags
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/log/centralW3CLogFile"
+            Key = "logExtFileFlags"
+            Value = "Date, Time, ClientIP, UserName, SiteName, ComputerName, ServerIP, Method, UriStem, UriQuery, HttpStatus, Win32Status, BytesSent, BytesRecv, TimeTaken, ServerPort, UserAgent, Cookie, Referer, ProtocolVersion, Host, HttpSubStatus"
+            IsAttribute = $true
+        }
+        
+        Script centralLogFilelogExtFileFlags
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name "logExtFileFlags" -Value "Date, Time, ClientIP, UserName, SiteName, ComputerName, ServerIP, Method, UriStem, UriQuery, HttpStatus, Win32Status, BytesSent, BytesRecv, TimeTaken, ServerPort, UserAgent, Cookie, Referer, ProtocolVersion, Host, HttpSubStatus"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name logExtFileFlags) -ieq "Date, Time, ClientIP, UserName, SiteName, ComputerName, ServerIP, Method, UriStem, UriQuery, HttpStatus, Win32Status, BytesSent, BytesRecv, TimeTaken, ServerPort, UserAgent, Cookie, Referer, ProtocolVersion, Host, HttpSubStatus"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name logExtFileFlags) -ieq "Date, Time, ClientIP, UserName, SiteName, ComputerName, ServerIP, Method, UriStem, UriQuery, HttpStatus, Win32Status, BytesSent, BytesRecv, TimeTaken, ServerPort, UserAgent, Cookie, Referer, ProtocolVersion, Host, HttpSubStatus")}
+         }
+
+         Script LogFileDirectory
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name "directory" -Value "Y:\Privateroot\LogFiles"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name directory) -ieq "Y:\Privateroot\LogFiles"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name directory) -ieq "Y:\Privateroot\LogFiles")}
+         }
+         
+         Script LogFiletruncateSize
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name "truncateSize" -Value "1073741824"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name truncateSize) -ieq "1073741824"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name truncateSize) -ieq "1073741824")}
+         }
+         
+         Script LogFilelocalTimeRollover
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name "localTimeRollover" -Value "True"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name localTimeRollover) -ieq "True"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/logFile -Name localTimeRollover) -ieq "True")}
+         }
+                
+         cAppHostKeyValue logFileFormat
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/sites/siteDefaults/logFile"
+            Key = "logFormat"
+            Value = "W3C"
+            IsAttribute = $true
+        }
+
+        Script traceFailedRequestsLoggingDir
+        {
+         Setscript ={Set-WebConfigurationProperty -filter /system.applicationHost/sites/siteDefaults/traceFailedRequestsLogging -Name "directory" -Value "Y:\Privateroot\FailedReqLogFiles"}
+         TestScript = {(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/traceFailedRequestsLogging -Name directory) -ieq "Y:\Privateroot\FailedReqLogFiles"}
+         Getscript = {return @(pathtest =(Get-WebConfigurationproperty -filter /system.applicationHost/sites/siteDefaults/traceFailedRequestsLogging -Name directory) -ieq "Y:\Privateroot\FailedReqLogFiles")}
+         }
+        cAppHostKeyValue traceFailedRequestsLoggingmaxLogFileSizeKB
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/sites/siteDefaults/traceFailedRequestsLogging"
+            Key = "maxLogFileSizeKB"
+            Value = "1048576"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue traceFailedRequestsLoggingMaxLogFiles
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/sites/siteDefaults/traceFailedRequestsLogging"
+            Key = "maxLogFiles"
+            Value = "10000"
+            IsAttribute = $true
+        }        
+
+        cAppHostKeyValue connectionTimeout
+        {
+            #Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/sites/siteDefaults/limits"
+            Key = "connectionTimeout"
+            Value = "00:30:00"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue maxUrlSegments
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/sites/siteDefaults/limits"
+            Key = "maxUrlSegments"
+            Value = "64"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue applicationPool
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/sites/applicationDefaults"
+            Key = "applicationPool"
+            Value = "DefaultAppPool"
+            IsAttribute = $true
+        }
+        Script enabledProtocols
+        {
+         Setscript = {Set-WebConfigurationproperty -filter /system.applicationHost/sites/applicationDefaults -Name enabledProtocols -Value "https, http"}
+         TestScript = {return ((Get-WebConfigurationproperty -filter /system.applicationHost/sites/applicationDefaults -Name enabledProtocols) -ieq "https, http")}
+         Getscript = {return @(pathtest = (Get-WebConfigurationproperty -filter /system.applicationHost/sites/applicationDefaults -Name enabledProtocols) -ieq "https, http")}
+         
+        }
+        cAppHostKeyValue allowSubDirConfig
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/sites/virtualDirectoryDefaults"
+            Key = "allowSubDirConfig"
+            Value = "true"
+            IsAttribute = $true
+        }                      
+        
+        Script configHistoryPhysicalPath
+        {
+         Setscript = {Set-WebConfigurationproperty -filter /system.applicationHost/configHistory -Name path -Value "Y:\Privateroot\configHistory"}
+         TestScript = {return ((Get-WebConfigurationproperty -filter /system.applicationHost/configHistory -Name path) -ieq "Y:\Privateroot\configHistory")}
+         Getscript = {return @(pathtest = (Get-WebConfigurationproperty -filter /system.applicationHost/configHistory -Name path) -ieq "Y:\Privateroot\configHistory")}
+         
+        }
+        cAppHostKeyValue configHistorymaxHistories
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/configHistory"
+            Key = "maxHistories"
+            Value = "1000"
+            IsAttribute = $true
+        }
+        ######Config History
+
+         cAppHostKeyValue configHistoryDir
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/configHistory"
+            Key = "path"
+            Value = "Y:\Privateroot\configHistory"
+            IsAttribute = $true
+        }
+        cAppHostKeyValue weblimitconnectionTimeout
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "/system.applicationHost/webLimits"
+            Key = "connectionTimeout"
+            Value = "00:30:00"
+            IsAttribute = $true
+        }          
+
+
+        #########ASP
+         cAppHostKeyValue errorsToNTLog
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp"
+            Key = "errorsToNTLog"
+            Value = "true"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue enableAspHtmlFallback
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp"
+            Key = "enableAspHtmlFallback"
+            Value = "false"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue diskTemplateCacheDirectory
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/cache"
+            Key = "diskTemplateCacheDirectory"
+            Value = "%SystemDrive%\inetpub\temp\ASP Compiled Templates"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue maxDiskTemplateCacheFiles
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/cache"
+            Key = "maxDiskTemplateCacheFiles"
+            Value = "2147483647"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue scriptFileCacheSize
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/cache"
+            Key = "scriptFileCacheSize"
+            Value = "2147483647"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue scriptFilescriptEngineCacheMax
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/cache"
+            Key = "scriptEngineCacheMax"
+            Value = "2147483647"
+            IsAttribute = $true
+        }
+
+         cAppHostKeyValue sessionTimeout
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/session"
+            Key = "timeout"
+            Value = "00:30:00"
+            IsAttribute = $true
+        }
+              
+        cAppHostKeyValue bufferingLimit
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/limits"
+            Key = "bufferingLimit"
+            Value = "12288000"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue maxRequestEntityAllowed
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/limits"
+            Key = "maxRequestEntityAllowed"
+            Value = "204800"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue processorThreadMax
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/limits"
+            Key = "processorThreadMax"
+            Value = "100"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue requestQueueMax
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/asp/limits"
+            Key = "requestQueueMax"
+            Value = "10000"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue defaultDocumentEnabled
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/defaultDocument"
+            Key = "enabled"
+            Value = "true"
+            IsAttribute = $true
+        } 
+        <#
+        cAppHostKeyValue isapiCgiRestrictionnotListedIsapisAllowed
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/security/isapiCgiRestriction"
+            Key = "notListedIsapisAllowed"
+            Value = "false"
+            IsAttribute = $true
+        }
+        #>
+
+        cAppHostKeyValue allowUnlisted
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/security/ipSecurity"
+            Key = "allowUnlisted"
+            Value = "true"
+            IsAttribute = $true
+        }
+        
+        cAppHostKeyValue notListedIsapisAllowed
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/security/isapiCgiRestriction"
+            Key = "notListedIsapisAllowed"
+            Value = "false"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue notListedCgisAllowed
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/security/isapiCgiRestriction"
+            Key = "notListedCgisAllowed"
+            Value = "false"
+            IsAttribute = $true
+        }
+
+        cAppHostKeyValue appConcurrentRequestLimit
+        {
+            Ensure = "Present"
+            WebsitePath = "MACHINE/WEBROOT/APPHOST"
+            ConfigSection =  "system.webserver/serverRuntime"
+            Key = "appConcurrentRequestLimit"
+            Value = "10000"
+            IsAttribute = $true
+        }
+        
+        Script DefaultPhysicalPath
+        {
+         Setscript = {Set-WebConfigurationProperty -filter system.applicationHost/sites/site/application/virtualDirectory -Name "physicalPath" -Value "Y:\root"}
+         TestScript = {return (Get-WebConfigurationproperty -filter system.applicationHost/sites/site/application/virtualDirectory -Name "physicalPath").value -contains "Y:\root"}
+         Getscript = {return @(pathtest = (Get-WebConfigurationproperty -filter system.applicationHost/sites/site/application/virtualDirectory -Name "physicalPath").value -eq "Y:\root")}
+         }
+         Script F5XForwardedFor
+        {
+         Setscript = {Add-WebConfiguration -PSPath "MACHINE/WEBROOT/APPHOST" -Filter /system.webServer/isapiFilters -Value @{name = 'F5XForwardedFor';path = 'Y:\F5XForwardedFor\F5XForwardedFor.dll'}}
+         TestScript = {return (Get-WebConfigurationproperty -PSPath "MACHINE/WEBROOT/APPHOST" -Filter /system.webServer/isapiFilters/filter -Name name).value -contains 'F5XForwardedFor' }
+         Getscript = {return @(isapifiltertest = (Get-WebConfigurationproperty -PSPath "MACHINE/WEBROOT/APPHOST" -Filter /system.webServer/isapiFilters/filter -Name name).value -contains 'F5XForwardedFor')}
+         DependsOn = '[File]F5XForwardedFor'
+        }
+        #######Registry Edits        
+        #Disables Domain profile firewall by setting registry value to 0, to enable change valuedata to "1"
+        Registry DomainFirewallDisabled {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\DomainProfile”
+            ValueName = “EnableFirewall”
+            ValueType = “DWord”
+            ValueData = “0”
+            }        
+        #Disables Public profile firewall by setting registry value to 0, to enable change valuedata to "1"
+        Registry PublicFirewallDisabled{
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\PublicProfile”
+            ValueName = “EnableFirewall”
+            ValueType = “DWord”
+            ValueData = “0”
+        }
+        #Disables Standard profile firewall by setting registry value to 0, to enable change valuedata to "1"
+        Registry StandardFirewallDisabled{
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SharedAccess\Parameters\FirewallPolicy\StandardProfile”
+            ValueName = “EnableFirewall”
+            ValueType = “DWord”
+            ValueData = “0”
+        }
+         Registry DisableautostartservermanagerDomainProfile {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ServerManager”
+            ValueName = “DoNotOpenServerManagerAtLogon”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+         Registry DisableautostartservermanagerAllUsers {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\ServerManager\Oobe”
+            ValueName = “DoNotOpenInitialConfigurationTasksAtLogon”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+        ################Disable JIT Debug
+        Registry 32Debugger {
+            Ensure = “Absent”
+            Key = “HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\AeDebug”
+            ValueName = "Debugger"
+        }
+        Registry 32DbgManagedDebugger {
+            Ensure = “Absent”
+            Key = “HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\.NETFramework\”
+            ValueName = "DbgManagedDebugger"
+        }
+        Registry 64Debugger {
+            Ensure = “Absent”
+            Key = “HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows NT\CurrentVersion\AeDebug”
+            ValueName = "Debugger"
+        }
+        Registry 64DbgManagedDebugger {
+            Ensure = “Absent”
+            Key = “HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\.NETFramework”
+            ValueName = "DbgManagedDebugger"
+        }
+        #######MSDTC
+        Registry NetworkDtcAccess {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC\Security”
+            ValueName = “NetworkDtcAccess”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+
+        Registry NetworkDtcAccessAdmin {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC\Security”
+            ValueName = “NetworkDtcAccessAdmin”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+
+        Registry XaTransactions {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC\Security”
+            ValueName = “XaTransactions”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+        Registry NetworkDtcAccessTransactions {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC\Security”
+            ValueName = “NetworkDtcAccessTransactions”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+        Registry NetworkDtcAccessOutbound {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC\Security”
+            ValueName = “NetworkDtcAccessOutbound”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+        Registry NetworkDtcAccessClients {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC\Security”
+            ValueName = “NetworkDtcAccessClients”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+        Registry NetworkDtcAccessInbound {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC\Security”
+            ValueName = “NetworkDtcAccessInbound”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+        Registry LuTransactions {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC\Security”
+            ValueName = “LuTransactions”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+        Registry AllowOnlySecureRpcCalls {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC”
+            ValueName = “AllowOnlySecureRpcCalls”
+            ValueType = “DWord”
+            ValueData = “0”
+        }
+        Registry FallbackToUnsecureRPCIfNecessary {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC”
+            ValueName = “FallbackToUnsecureRPCIfNecessary”
+            ValueType = “DWord”
+            ValueData = “0”
+        }
+        Registry TurnOffRpcSecurity {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\MSDTC”
+            ValueName = “TurnOffRpcSecurity”
+            ValueType = “DWord”
+            ValueData = “1”
+        }
+        Registry Ports {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\Rpc\Internet”
+            ValueName = “Ports”
+            ValueType = “MultiString”
+            ValueData = “5000-5200”
+        }
+        Registry PortsInternetAvailable {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\Rpc\Internet”
+            ValueName = “PortsInternetAvailable”
+            ValueType = “String”
+            ValueData = “Y”
+        }
+        Registry UseInternetPorts {
+            Ensure = “Present”
+            Key = “HKEY_LOCAL_MACHINE\Software\Microsoft\Rpc\Internet”
+            ValueName = “UseInternetPorts”
+            ValueType = “String”
+            ValueData = “Y”
+        }
+    }
+    }
+    TATSConfig -ConfigurationData $test -OutputPath 'Y:\rburke\tats'
+#Start-DscConfiguration -Path Y:\rburke\tats -Wait -Force -Verbose
